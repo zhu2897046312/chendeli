@@ -1,0 +1,6 @@
+selenium==4.16.0
+webdriver_manager==4.0.1
+pytest==7.4.3 
+
+# 你帮我重新写以下自动化测试，登录、注册功能测试到test\user层
+#广告相关的测试在test\advertisement层，订单相关到etst\order层，商品相关的在test\product层
