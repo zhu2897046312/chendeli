@@ -10,6 +10,7 @@ type Config struct {
     Database DatabaseConfig `mapstructure:"database"`
     Redis    RedisConfig    `mapstructure:"redis"`
     Email    EmailConfig    `mapstructure:"email"`
+    MongoDB  MongoDBConfig  `mapstructure:"mongodb"`  // 新增MongoDB配置
     Payment  PaymentConfig  `mapstructure:"payment"`
 }
 
@@ -74,6 +75,21 @@ type AlipayConfig struct {
     NotifyURL  string `mapstructure:"notify_url"`
 }
 
+type MongoDBConfig struct {
+    Host     string `mapstructure:"host"`
+    Port     int    `mapstructure:"port"`
+    Username string `mapstructure:"username"`
+    Password string `mapstructure:"password"`
+    DBName   string `mapstructure:"dbname"`
+}
+func (c *MongoDBConfig) URI() string {
+    return fmt.Sprintf("mongodb://%s:%s@%s:%d/?authSource=admin",
+        c.Username,
+        c.Password,
+        c.Host,
+        c.Port,
+    )
+}
 var GlobalConfig Config
 
 func Init() error {
@@ -130,7 +146,15 @@ func Init() error {
     fmt.Printf("App ID: %s\n", GlobalConfig.Payment.Alipay.AppID)
     fmt.Printf("Notify URL: %s\n", GlobalConfig.Payment.Alipay.NotifyURL)
 
+    fmt.Printf("\n=== MongoDB Configuration ===\n")
+    fmt.Printf("Host: %s\n", GlobalConfig.MongoDB.Host)
+    fmt.Printf("Port: %d\n", GlobalConfig.MongoDB.Port)
+    fmt.Printf("Username: %s\n", GlobalConfig.MongoDB.Username)
+    fmt.Printf("Database: %s\n", GlobalConfig.MongoDB.DBName)
+
     fmt.Printf("\n=== Configuration End ===\n\n")
+
+
 
 
     return nil

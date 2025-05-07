@@ -4,14 +4,19 @@ import (
 	"web-task/internal/api/handlers"
 	"web-task/internal/middleware"
 	"web-task/internal/service"
-
+	"web-task/internal/config"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
-func RegisterRoutes(r *gin.Engine, sf *service.ServiceFactory, db *gorm.DB) {
+func RegisterRoutes(r *gin.Engine, sf *service.ServiceFactory, db *gorm.DB,mongoClient *mongo.Client) {
 	// 注入服务和数据库连接
-	r.Use(middleware.InjectServices(sf, db))
+	r.Use(
+		middleware.Cors(),                           // CORS中间件
+		middleware.Logger(mongoClient, config.GlobalConfig.MongoDB.DBName),  // 日志中间件
+		middleware.InjectServices(sf, db),           // 服务注入中间件
+	)
 
 	// 健康检查
 	r.GET("/health", handlers.HealthCheck)
