@@ -1,12 +1,19 @@
 package service
 
+import (
+	"github.com/go-redis/redis/v8"
+)
 
 type ServiceFactory struct {
 	base *Service
+	redisClient *redis.Client
 }
 
-func NewServiceFactory(base *Service) *ServiceFactory {
-	return &ServiceFactory{base: base}
+func NewServiceFactory(base *Service, redisClient *redis.Client) *ServiceFactory {
+	return &ServiceFactory{
+		base:     base,
+		redisClient: redisClient,
+	}
 }
 
 func (f *ServiceFactory) GetUserService() *UserService {
@@ -14,7 +21,7 @@ func (f *ServiceFactory) GetUserService() *UserService {
 }
 
 func (f *ServiceFactory) GetProductService() *ProductService {
-	return NewProductService(f.base)
+	return NewProductService(f.base,f.redisClient)
 }
 
 func (f *ServiceFactory) GetOrderService() *OrderService {

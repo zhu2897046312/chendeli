@@ -14,6 +14,7 @@ import (
     "go.mongodb.org/mongo-driver/mongo/options"
     
     "github.com/gin-gonic/gin"
+    "github.com/go-redis/redis/v8"
 )
 
 func main() {
@@ -27,13 +28,23 @@ func main() {
     if err != nil {
         log.Fatalf("数据库初始化失败: %v", err)
     }
+    redisClient := redis.NewClient(&redis.Options{
+		Addr:     fmt.Sprintf("%s:%d", config.GlobalConfig.Redis.Host, config.GlobalConfig.Redis.Port),
+		Password: config.GlobalConfig.Redis.Password,
+		DB:       config.GlobalConfig.Redis.DB,
+	})
+
+	// 测试Redis连接
+	if _, err := redisClient.Ping(context.Background()).Result(); err != nil {
+		log.Fatal("Failed to connect to Redis:", err)
+	}
 
     // 创建仓储工厂
     repoFactory := repository.NewRepositoryFactory(db)
 
     // 创建服务工厂
     baseService := service.NewService(repoFactory)
-    serviceFactory := service.NewServiceFactory(baseService)
+    serviceFactory := service.NewServiceFactory(baseService,redisClient)
 
     // 创建 Gin 引擎
     r := gin.Default()

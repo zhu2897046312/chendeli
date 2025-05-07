@@ -20,9 +20,9 @@ mongodb:
   dbname: "web_task_logs"
 
 redis:
-  host: localhost
+  host: "172.25.13.23"
   port: 6379
-  password: "0608"
+  password: "123"
   db: 0 
 
 email:
